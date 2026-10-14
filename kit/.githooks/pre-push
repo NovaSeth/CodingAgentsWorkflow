@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# pre-push — bramka sekretów na WYPYCHANYCH commitach (nie na drzewie roboczym). Włączenie: git config core.hooksPath .githooks
+# Git podaje na stdin linie „local_ref local_sha remote_ref remote_sha”; dla każdej skanujemy treść wszystkich
+# commitów zakresu — sekret dodany i usunięty kolejnym commitem też trafiłby na remote.
+# Kod 1 (znaleziska) i 2 (błąd narzędzia) blokują push. Błąd narzędzia nigdy nie jest „czysto”.
+root="$(git rev-parse --show-toplevel)" || exit 1
+scan="$root/.workflow/bin/check-secrets.sh"
+[ -f "$scan" ] || { echo "pre-push: brak $scan — push zablokowany" >&2; exit 1; }
+
+zero() { case "$1" in *[!0]*) return 1 ;; *) return 0 ;; esac; }
+blocked=0
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ -n "${local_sha:-}" ] || continue
+  zero "$local_sha" && continue                      # usunięcie gałęzi na remote — nic nie wypychamy
+  if zero "${remote_sha:-0}" || ! git cat-file -e "$remote_sha^{commit}" 2>/dev/null; then
+    # nowa gałąź albo nieznany lokalnie stan remote: commity, których nie ma na żadnym remote
+    set -- "$local_sha" --not --remotes
+  else
+    set -- "$remote_sha..$local_sha"
+  fi
+  bash "$scan" --range "$@" </dev/null
+  rc=$?
+  if [ $rc -ne 0 ]; then
+    echo "pre-push: check-secrets ($local_ref → $remote_ref) zwrócił $rc — push zablokowany" >&2
+    blocked=1
+  fi
+done
+[ $blocked -eq 0 ] || exit 1
+# Opcjonalnie: wygenerowane pliki aktualne (odkomentuj i dopasuj)
+# npm run gen -- --check || { echo "pre-push: wygenerowane pliki nieaktualne" >&2; exit 1; }
+exit 0

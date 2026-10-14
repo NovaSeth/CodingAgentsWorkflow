@@ -1,0 +1,33 @@
+{
+  "name": "typescript",
+  "label": "TypeScript (Node ≥ 24, backend / web / React Native)",
+  "tools": ["node", "npm"],
+  "commands": {
+    "install": "npm ci",
+    "typecheck": "npm run typecheck",
+    "lint": "npm run lint",
+    "test": "npm test",
+    "gate": "npm run typecheck && npm run lint && npm test"
+  },
+  "workerLimit": "node --test: --test-concurrency=2 · Jest: --maxWorkers=2 (bez '--' w pnpm ≥ 10) · Vitest: --maxWorkers=2",
+  "ciSetup": [
+    "      - name: Node z cache npm (jest package-lock.json)",
+    "        if: ${{ hashFiles('package-lock.json') != '' }}",
+    "        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0",
+    "        with:",
+    "          node-version: 24",
+    "          cache: npm",
+    "      - name: Node bez cache (brak package-lock.json)",
+    "        if: ${{ hashFiles('package-lock.json') == '' }}",
+    "        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0",
+    "        with:",
+    "          node-version: 24",
+    "      - name: zależności (npm ci z lockfile, inaczej npm install)",
+    "        run: if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi"
+  ],
+  "ciGate": [
+    "      - run: npm run typecheck",
+    "      - run: npm run lint",
+    "      - run: npm test"
+  ]
+}

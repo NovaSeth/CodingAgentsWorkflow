@@ -1,0 +1,26 @@
+{
+  "name": "coding-agents-workflow",
+  "version": "1.5.1",
+  "private": true,
+  "description": "Metoda i kit do budowania oprogramowania zespołem agentów AI",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "check-secrets": "bash kit/.workflow/bin/check-secrets.sh"
+  },
+  "bin": {
+    "coding-agents-workflow": "scripts/setup.mjs"
+  },
+  "files": [
+    "scripts",
+    "kit",
+    "docs",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ]
+}

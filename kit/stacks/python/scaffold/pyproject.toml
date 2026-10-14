@@ -1,0 +1,43 @@
+[project]
+name = "{{PKG}}"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=9.1", "pytest-xdist>=3.8", "ruff>=0.17", "mypy>=2.4", "import-linter>=2.15"]
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 110
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "S", "UP"]   # S = bandit (bezpieczeństwo)
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+
+[tool.mypy]
+strict = true
+
+# Granice modułów (obrona w głąb; rozstrzyga tests/test_architecture.py)
+[tool.importlinter]
+root_package = "{{PY_PKG}}"
+
+[[tool.importlinter.contracts]]
+name = "Platforma nie importuje modułów"
+type = "forbidden"
+source_modules = ["{{PY_PKG}}.platform"]
+forbidden_modules = ["{{PY_PKG}}.modules"]
+
+# Zasada „import innego modułu tylko przez jego pakiet” — tests/test_architecture.py (import-linter nie ma
+# kontraktu „tylko przez __init__”). Jeśli moduły mają się nie importować wcale (tylko zdarzenia / kompozycja),
+# dodaj kontrakt: type = "independence", modules = ["{{PY_PKG}}.modules.*"].

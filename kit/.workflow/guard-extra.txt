@@ -1,0 +1,3 @@
+# Dodatkowe blokady poleceń Bash dla TEGO projektu (hook .claude/hooks/guard-bash.mjs). Plik należy do projektu.
+# Format linii: <regex ERE><TAB><komunikat dla agenta z ID reguły>. Przykład (odkomentuj i dopasuj):
+#\bnpm\s+publish\b	Publikacja pakietu wymaga decyzji człowieka (ZAS-20).

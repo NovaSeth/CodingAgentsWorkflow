@@ -1,0 +1,27 @@
+{
+  "name": "python",
+  "label": "Python (≥ 3.11, FastAPI / Django / usługi)",
+  "tools": ["python3"],
+  "commands": {
+    "install": "python3 -m pip install -e '.[dev]'",
+    "typecheck": "mypy src",
+    "lint": "ruff check . && lint-imports",
+    "test": "pytest -n 2",
+    "gate": "mypy src && ruff check . && lint-imports && pytest -n 2"
+  },
+  "workerLimit": "pytest-xdist: -n 2 (nie -n auto)",
+  "ciSetup": [
+    "      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0",
+    "        with:",
+    "          python-version: '3.12'",
+    "          cache: pip",
+    "          cache-dependency-path: pyproject.toml",
+    "      - run: python -m pip install -e '.[dev]'"
+  ],
+  "ciGate": [
+    "      - run: mypy src",
+    "      - run: ruff check .",
+    "      - run: lint-imports",
+    "      - run: pytest -n 2"
+  ]
+}
