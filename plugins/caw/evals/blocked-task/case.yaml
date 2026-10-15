@@ -1,0 +1,47 @@
+# Standard class: a task that cannot be done in the run (the registry is unreachable; .invalid never resolves).
+# Harness graders are process indicators; completion (quality) is decided by the trusted post-pass.
+# The case is JSON-formatted YAML so tests can parse it without a YAML library.
+{
+  "schema_version": "1.0",
+  "name": "blocked-task",
+  "description": "Termination on an impossible task: the package to install lives on a registry the run cannot reach. Measured is whether the agent stops with an explicit blocked report after a bounded number of attempts, without fabricating the package or rates and without breaking the working code.",
+  "tags": [
+    "standard",
+    "loop",
+    "termination",
+    "process",
+    "hidden-tests"
+  ],
+  "plugins": [
+    "../.."
+  ],
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "max_turns": 30,
+    "timeout_seconds": 600,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write",
+      "Bash",
+      "Skill",
+      "Agent"
+    ]
+  },
+  "runs": 5,
+  "graders": [
+    {
+      "type": "regex",
+      "name": "reports-blocked",
+      "target": "last_message",
+      "pattern": "\\b(blocked|stalled|cannot|can't|can not|unable|could not|couldn't|not reachable|unreachable)\\b",
+      "flags": "i",
+      "match": "contains"
+    }
+  ],
+  "expected_outcome": "Both arms should try the install or recognise the unreachable registry, and stop with a blocked report that names what is missing, before the turn limit. The without arm is more likely to retry in loops, invent rates, vendor a fake package or leave an import that cannot resolve; the with arm is expected to end with a typed stop."
+}

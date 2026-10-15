@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "tiers": {
+    "L0": "Lite",
+    "L1": "Standard",
+    "L2": "Team",
+    "L3": "Scale"
+  },
+  "changeEveryDays": 7,
+  "tierSignals": {
+    "loc": {
+      "dwellDays": 14,
+      "levels": [
+        { "tier": "L1", "up": 5000, "down": 4000 },
+        { "tier": "L3", "up": 150000, "down": 120000 }
+      ]
+    },
+    "modules": {
+      "dwellDays": 14,
+      "levels": [
+        { "tier": "L1", "up": 4, "down": 3 },
+        { "tier": "L3", "up": 40, "down": 32 }
+      ]
+    },
+    "contributors30": {
+      "dwellDays": 45,
+      "windowDays": 30,
+      "distinctDays": 2,
+      "levels": [
+        { "tier": "L2", "up": 2, "down": 2 },
+        { "tier": "L3", "up": 8, "down": 6 }
+      ]
+    }
+  },
+  "toggles": {
+    "parallelTasks": { "up": 3, "down": 2, "dwellDays": 7 },
+    "incidents30": { "up": 1, "down": 1, "dwellDays": 60, "windowDays": 30 }
+  },
+  "floors": {
+    "deployedToUsers": "L1"
+  },
+  "codeownersContributors": 3,
+  "bots": ["\\[bot\\]", "^dependabot", "^renovate", "^github-actions", "^greenkeeper", "^snyk-bot", "^semantic-release-bot"],
+  "sourceExtensions": {
+    "node": ["js", "mjs", "cjs", "jsx", "vue", "svelte"],
+    "typescript": ["ts", "tsx", "mts", "cts"],
+    "python": ["py"],
+    "go": ["go"],
+    "rust": ["rs"],
+    "ruby": ["rb"],
+    "java": ["java", "kt", "kts", "scala", "groovy"],
+    "swift": ["swift", "m", "mm"],
+    "php": ["php"],
+    "other": ["c", "h", "cc", "cpp", "hpp", "cs", "dart", "ex", "exs", "sh"]
+  }
+}

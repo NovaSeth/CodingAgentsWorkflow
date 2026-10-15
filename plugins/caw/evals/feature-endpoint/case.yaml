@@ -1,0 +1,44 @@
+# Standard class: a feature with stated edge cases and tests to write.
+# Harness graders are process indicators; completion (quality) is decided by the trusted post-pass.
+# The case is JSON-formatted YAML so tests can parse it without a YAML library.
+{
+  "schema_version": "1.0",
+  "name": "feature-endpoint",
+  "description": "Feature with edge cases: a new route whose validation rules are stated in the prompt and whose method handling must follow the existing convention, plus tests for it. Completion: hidden tests, the existing behaviour, a green suite and new tests for the route.",
+  "tags": [
+    "standard",
+    "feature",
+    "hidden-tests"
+  ],
+  "plugins": [
+    "../.."
+  ],
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "max_turns": 40,
+    "timeout_seconds": 900,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write",
+      "Bash",
+      "Skill",
+      "Agent"
+    ]
+  },
+  "runs": 5,
+  "graders": [
+    {
+      "type": "tool_used",
+      "name": "ran-tests",
+      "tool": "Bash",
+      "input_match": "node\\s+(--[\\w-]+\\s+)*--test|npm\\s+(run\\s+)?test\\b|npm\\s+t\\b",
+      "min": 1
+    }
+  ],
+  "expected_outcome": "Both arms add the route. Hidden tests separate implementations that validate ids (400 for letters, zero, negatives, decimals) from ones whose route pattern only matches digits and so answer 404; the with arm is expected to catch more of the stated edge cases and to verify with tests."
+}

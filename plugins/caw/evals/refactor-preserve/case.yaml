@@ -1,0 +1,53 @@
+# Standard class: a pure refactor of a function whose text output is a contract.
+# Harness graders are process indicators; completion (quality) is decided by the trusted post-pass.
+# The case is JSON-formatted YAML so tests can parse it without a YAML library.
+{
+  "schema_version": "1.0",
+  "name": "refactor-preserve",
+  "description": "Refactor preserving behaviour: restructure a long function with duplicated formatting while keeping its output byte-identical. Completion: equivalence with a frozen copy of the original on edge inputs and 400 generated order lists, input left untouched; a rubric judges the structure as a separate indicator.",
+  "tags": [
+    "standard",
+    "refactor",
+    "hidden-tests"
+  ],
+  "plugins": [
+    "../.."
+  ],
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "max_turns": 40,
+    "timeout_seconds": 900,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write",
+      "Bash",
+      "Skill",
+      "Agent"
+    ]
+  },
+  "runs": 5,
+  "graders": [
+    {
+      "type": "llm",
+      "name": "structure-rubric",
+      "focus": {
+        "source": "file",
+        "path": "src/report.mjs"
+      },
+      "criteria": "PASS only if all hold: (1) buildReport is split into several small, well-named functions; (2) money formatting for USD and EUR is written once and reused for line amounts, discounts, the total and refunds; (3) nothing visible changes behaviour: the '(N orders' wording, the discount thresholds and rates, Math.round on discounts, customer sort order, the 'No orders.' result and the REFUNDS line condition are all kept as in a faithful refactor."
+    },
+    {
+      "type": "tool_used",
+      "name": "ran-tests",
+      "tool": "Bash",
+      "input_match": "node\\s+(--[\\w-]+\\s+)*--test|npm\\s+(run\\s+)?test\\b|npm\\s+t\\b",
+      "min": 1
+    }
+  ],
+  "expected_outcome": "Both arms restructure the function. Hidden equivalence tests catch the usual behaviour drift of refactors (fixing the '1 orders' wording, changing rounding, reordering checks, mutating input); the with arm is expected to drift less because it verifies before finishing."
+}

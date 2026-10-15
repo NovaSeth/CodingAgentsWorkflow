@@ -1,0 +1,20 @@
+{
+  "checks": [
+    {
+      "check": "hidden-tests"
+    },
+    {
+      "check": "visible-port",
+      "files": [
+        "test/app.test.mjs"
+      ]
+    },
+    {
+      "check": "visible-suite"
+    },
+    {
+      "check": "tests-added",
+      "mentions": "/items/"
+    }
+  ]
+}

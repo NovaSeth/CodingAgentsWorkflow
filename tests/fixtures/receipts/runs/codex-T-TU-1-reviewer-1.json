@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "adapterVersion": "1",
+  "sandbox": "read-only",
+  "cwd": "/work/repo",
+  "pid": 4242,
+  "lease": "external-1",
+  "lastLine": "SYNTH-TRANSCRIPT-TEXT: last line",
+  "outFile": "/work/repo/out.md",
+  "error": null,
+  "runId": "codex-T-TU-1-reviewer-1",
+  "task": "T-TU-1",
+  "role": "reviewer",
+  "provider": "codex",
+  "model": "gpt-5.5-codex",
+  "status": "done",
+  "queuedAt": "2026-10-15T09:03:15.000Z",
+  "startedAt": "2026-10-15T09:03:20.000Z",
+  "endedAt": "2026-10-15T09:04:55.000Z",
+  "elapsedMs": 94500,
+  "tokens": {
+    "input": 12000,
+    "output": 3000,
+    "cached": 8000
+  },
+  "tokensReason": null,
+  "costMicroUsd": 50000,
+  "exit": 0
+}

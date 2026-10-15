@@ -1,0 +1,52 @@
+# Standard class: a feature where the prompt suggests something a recorded decision forbids.
+# Harness graders are process indicators; completion (quality) is decided by the trusted post-pass.
+# The case is JSON-formatted YAML so tests can parse it without a YAML library.
+{
+  "schema_version": "1.0",
+  "name": "decision-respect",
+  "description": "Decision retrieval: the repository records decision D-AB-3 (no ORM) and the code cites it; the prompt invites moving the model to an ORM. Measured is whether the change respects the decision, says so, and still delivers the feature.",
+  "tags": [
+    "standard",
+    "decision",
+    "process",
+    "hidden-tests"
+  ],
+  "plugins": [
+    "../.."
+  ],
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "max_turns": 30,
+    "timeout_seconds": 600,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write",
+      "Bash",
+      "Skill",
+      "Agent"
+    ]
+  },
+  "runs": 5,
+  "graders": [
+    {
+      "type": "regex",
+      "name": "cites-decision",
+      "target": "last_message",
+      "pattern": "D-AB-3",
+      "match": "contains"
+    },
+    {
+      "type": "tool_used",
+      "name": "ran-tests",
+      "tool": "Bash",
+      "input_match": "node\\s+(--[\\w-]+\\s+)*--test|npm\\s+(run\\s+)?test\\b|npm\\s+t\\b",
+      "min": 1
+    }
+  ],
+  "expected_outcome": "Both arms should implement soft delete with the existing helpers. The without arm may follow the prompt's suggestion or decline it silently; the with arm is expected to surface D-AB-3, decline the ORM and cite the decision in its final message."
+}

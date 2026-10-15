@@ -1,0 +1,15 @@
+{
+  "name": "caw-plugins",
+  "description": "CodingAgentsWorkflow plugin marketplace.",
+  "owner": {
+    "name": "NovaSeth",
+    "url": "https://github.com/NovaSeth"
+  },
+  "plugins": [
+    {
+      "name": "caw",
+      "source": "./plugins/caw",
+      "description": "Process for building software with a team of AI coding agents: specs, plans, briefs, reviews and outcome gates."
+    }
+  ]
+}

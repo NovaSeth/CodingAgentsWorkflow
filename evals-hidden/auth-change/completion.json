@@ -1,0 +1,18 @@
+{
+  "checks": [
+    {
+      "check": "hidden-tests"
+    },
+    {
+      "check": "visible-suite"
+    },
+    {
+      "check": "tests-added",
+      "mentions": "x-signature"
+    },
+    {
+      "check": "secret-absent",
+      "secret": "dev.K7Qx4P"
+    }
+  ]
+}

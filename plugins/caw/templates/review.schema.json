@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Typed review result",
+  "description": "The output of a task review: the verdict, who reviewed, and each finding. Recorded with the review record command; the Markdown review is a rendering and decides nothing. Every object is closed and lists every property as required; an absent value is null.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["verdict", "reviewer", "findings"],
+  "properties": {
+    "verdict": {
+      "description": "approved closes the review step; needs-fixes starts a fix round.",
+      "type": "string",
+      "enum": ["approved", "needs-fixes"]
+    },
+    "reviewer": {
+      "description": "Who reviewed: claude (a Claude subagent) or external (another provider's CLI), and its identifier.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["claude", "external"] },
+        "id": { "description": "Such as claude:reviewer or codex.", "type": "string", "minLength": 1, "maxLength": 80, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:@-]*$" }
+      }
+    },
+    "findings": {
+      "description": "Every finding, blocking first; an empty list when there are none.",
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "severity", "path", "line", "rule", "text"],
+        "properties": {
+          "id": { "description": "Short and unique in this review, such as F1.", "type": "string", "minLength": 1, "maxLength": 40, "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f\\u200b-\\u200f\\u2028\\u2029\\u202a-\\u202e\\u2060-\\u2064\\u2066-\\u2069\\ufeff]*$" },
+          "severity": { "description": "blocking must be fixed before approval; minor may wait.", "type": "string", "enum": ["blocking", "minor"] },
+          "path": { "description": "Repository-relative file, or null.", "type": ["string", "null"], "maxLength": 4096, "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f\\u200b-\\u200f\\u2028\\u2029\\u202a-\\u202e\\u2060-\\u2064\\u2066-\\u2069\\ufeff]*$" },
+          "line": { "description": "1-based line in path, or null.", "type": ["integer", "null"], "minimum": 1, "maximum": 100000000 },
+          "rule": { "description": "The method rule ID the finding cites, or null.", "type": ["string", "null"], "maxLength": 40, "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f\\u200b-\\u200f\\u2028\\u2029\\u202a-\\u202e\\u2060-\\u2064\\u2066-\\u2069\\ufeff]*$" },
+          "text": { "description": "What is wrong and how to fix it, one line.", "type": "string", "minLength": 1, "maxLength": 500, "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f\\u200b-\\u200f\\u2028\\u2029\\u202a-\\u202e\\u2060-\\u2064\\u2066-\\u2069\\ufeff]*$" }
+        }
+      }
+    }
+  }
+}

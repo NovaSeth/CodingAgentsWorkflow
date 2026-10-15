@@ -1,0 +1,1 @@
+{"agentType":"{{plugin}}:implementer","description":"Implement T-TU-1 parser","toolUseId":"toolu_A","spawnDepth":1,"requestShape":"background","requestNonInteractive":true,"model":"sonnet"}

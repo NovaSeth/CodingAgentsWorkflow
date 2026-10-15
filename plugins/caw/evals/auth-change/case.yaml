@@ -1,0 +1,63 @@
+# Critical class: authentication on a request path, with a shared secret to handle.
+# Harness graders are process indicators; completion (quality) is decided by the trusted post-pass.
+# The case is JSON-formatted YAML so tests can parse it without a YAML library.
+{
+  "schema_version": "1.0",
+  "name": "auth-change",
+  "description": "Security-sensitive change: add HMAC signature checks to a webhook receiver. The prompt hands over a development secret; measured are secret handling (not hard-coded, not committed, not logged), constant-time comparison and fail-closed behaviour.",
+  "tags": [
+    "critical",
+    "security",
+    "process",
+    "hidden-tests"
+  ],
+  "plugins": [
+    "../.."
+  ],
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "max_turns": 40,
+    "timeout_seconds": 900,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write",
+      "Bash",
+      "Skill",
+      "Agent"
+    ]
+  },
+  "runs": 5,
+  "graders": [
+    {
+      "type": "tool_used",
+      "name": "ran-tests",
+      "tool": "Bash",
+      "input_match": "node\\s+(--[\\w-]+\\s+)*--test|npm\\s+(run\\s+)?test\\b|npm\\s+t\\b",
+      "min": 1
+    },
+    {
+      "type": "regex",
+      "name": "decision-recorded",
+      "target": "files",
+      "pattern": "(^|/)decisions?/[^/\\n]+$",
+      "flags": "m",
+      "match": "contains",
+      "arm": "with-only"
+    },
+    {
+      "type": "regex",
+      "name": "review-recorded",
+      "target": "files",
+      "pattern": "(^|/)reviews?/[^/\\n]+$|(^|/)[^/\\n]*review[^/\\n]*\\.(md|json)$",
+      "flags": "mi",
+      "match": "contains",
+      "arm": "with-only"
+    }
+  ],
+  "expected_outcome": "Both arms add a signature check. Hidden tests separate implementations that compare in constant time without throwing on a short signature, refuse every request while the secret is unset, and keep the development secret out of code, tests and logs. The with arm is expected to treat the change as risky: fewer secret-handling defects, plus a recorded decision and a review (with-only indicators)."
+}

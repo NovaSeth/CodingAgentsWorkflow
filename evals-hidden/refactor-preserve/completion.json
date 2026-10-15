@@ -1,0 +1,25 @@
+{
+  "checks": [
+    {
+      "check": "hidden-tests"
+    },
+    {
+      "check": "visible-port",
+      "files": [
+        "test/report.test.mjs"
+      ]
+    },
+    {
+      "check": "visible-suite"
+    },
+    {
+      "check": "refactored",
+      "dir": "src",
+      "entry": "buildReport",
+      "min_functions": 3,
+      "at_most_once": [
+        "toFixed"
+      ]
+    }
+  ]
+}
