@@ -74,10 +74,10 @@ test('git option abbreviations: the guard resolves them as git does, or blocks',
     if (g.kind === 'bool') ok = !o || (name === g.name && !eats);
     else if (g.kind === 'req') ok = !o || (name === g.name && eats);
     else if (g.kind === 'opt') ok = !o || !eats;
-    // ambiguous or unknown in git: the guard must not resolve it either (review r1 #10). Known limitation: git config's table
-    // joins the classic mode (the oracle) and the subcommand mode, so --all/--regexp/--value/--url/--append resolve where
-    // classic git reports them unknown and refuses to run.
-    else ok = o === null || sub === 'config';
+    // Ambiguous or unknown in the installed git: git refuses the command and runs nothing, so any guard verdict is safe. The
+    // tables follow the newest git (an option a newer git added, e.g. fetch --negotiation-restrict in 2.55, makes an older
+    // abbreviation ambiguous there and is unknown to an older git); the exact-resolution share below keeps them close.
+    else ok = true;
     if (!ok) bad.push(`git ${sub} --${p}: git ${g.kind} ${g.name ?? ''}, guard ${o ? `${name}${eats ? ' (takes the next word)' : ''}` : 'unresolved'}`);
     if ((o === null) === (g.kind === 'ambiguous' || g.kind === 'unknown')) exact++;
   });

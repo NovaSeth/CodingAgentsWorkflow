@@ -40,12 +40,12 @@ export const GIT_LONG = Object.freeze({
     + 'remote-submodules sparse bundle-uri='),
   fetch: opts('verbose quiet all set-upstream append atomic upload-pack= force multiple tags jobs= prefetch prune prune-tags recurse-submodules? recurse-submodules-default= '
     + 'dry-run porcelain write-fetch-head keep update-head-ok progress depth= shallow-since= shallow-exclude= deepen= !unshallow !refetch '
-    + 'update-shallow !refmap= server-option= !ipv4 !ipv6 negotiation-tip= negotiate-only filter= auto-maintenance auto-gc show-forced-updates '
+    + 'update-shallow !refmap= server-option= !ipv4 !ipv6 negotiation-tip= negotiation-restrict= negotiation-include= negotiate-only filter= auto-maintenance auto-gc show-forced-updates '
     + 'write-commit-graph stdin'),
   pull: opts('verbose quiet progress recurse-submodules? rebase? stat summary compact-summary log? signoff? squash commit edit cleanup= ff !ff-only '
     + 'verify verify-signatures autostash strategy= strategy-option= gpg-sign? allow-unrelated-histories all append upload-pack= force tags '
     + 'prune jobs= dry-run keep depth= shallow-since= shallow-exclude= deepen= !unshallow update-shallow !refmap= server-option= ipv4 ipv6 '
-    + 'negotiation-tip= show-forced-updates set-upstream'),
+    + 'negotiation-tip= negotiation-restrict= negotiation-include= show-forced-updates set-upstream'),
   'ls-remote': opts('quiet upload-pack= exec= tags branches heads refs get-url sort= exit-code symref server-option='),
   grep: opts('cached no-index untracked exclude-standard recurse-submodules invert-match ignore-case word-regexp text textconv recursive '
     + '!max-depth= extended-regexp basic-regexp fixed-strings perl-regexp line-number column full-name files-with-matches name-only '
