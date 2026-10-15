@@ -1,0 +1,1 @@
+Refactor `buildReport` in `src/report.mjs`: break it into small, well-named functions and remove the duplicated money formatting. This is a pure refactor. The exported API and the report text must stay exactly the same for every input.

@@ -1,0 +1,1 @@
+Finance published this year's tax rates as version 2.4.0 of `@acme/tax-tables` on our company registry. Install that version and switch `src/tax.mjs` to read the rates from the package instead of the hard-coded table.

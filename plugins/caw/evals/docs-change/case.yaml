@@ -1,0 +1,45 @@
+# Trivial class: a one-row documentation change. Measures the plugin's overhead on docs work.
+# Harness graders are process indicators; completion (quality) is decided by the trusted post-pass.
+# The case is JSON-formatted YAML so tests can parse it without a YAML library.
+{
+  "schema_version": "1.0",
+  "name": "docs-change",
+  "description": "Overhead on docs work: add one row to a README table, reading the behaviour from the code. Both arms should pass; the comparison is tokens, cost and wall time per arm.",
+  "tags": [
+    "trivial",
+    "overhead",
+    "docs",
+    "hidden-tests"
+  ],
+  "plugins": [
+    "../.."
+  ],
+  "context": {
+    "scaffold_script": "scaffold.sh"
+  },
+  "execution": {
+    "max_turns": 15,
+    "timeout_seconds": 300,
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write",
+      "Bash",
+      "Skill",
+      "Agent"
+    ]
+  },
+  "runs": 5,
+  "graders": [
+    {
+      "type": "tool_used",
+      "name": "few-shell-calls",
+      "tool": "Bash",
+      "min": 0,
+      "max": 4
+    }
+  ],
+  "expected_outcome": "Both arms add a correct row and complete the task. The with arm should stay close to the without arm's tokens and wall time; the gap between them is the plugin's overhead on docs work."
+}

@@ -1,0 +1,22 @@
+{
+  "checks": [
+    {
+      "check": "hidden-tests"
+    },
+    {
+      "check": "visible-port",
+      "files": [
+        "test/cli.test.mjs"
+      ]
+    },
+    {
+      "check": "visible-suite"
+    },
+    {
+      "check": "decision-record",
+      "subject": "\\bdue\\b",
+      "choice": "\\b(ISO|strings?|Date|timestamps?|epoch|YYYY-MM-DD)\\b",
+      "verb": "\\b(decid\\w*|decision|chose|chosen|choose|stor\\w*|kept|keep|represent\\w*)\\b"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "checks": [
+    {
+      "check": "hidden-tests"
+    },
+    {
+      "check": "visible-port",
+      "files": [
+        "test/cli.test.mjs"
+      ]
+    },
+    {
+      "check": "visible-suite"
+    }
+  ]
+}

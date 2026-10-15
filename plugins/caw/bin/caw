@@ -1,0 +1,89 @@
+#!/usr/bin/env node
+// Launcher: on the Bash tool PATH while the plugin is enabled, the package.json bin (npx channel) and the hook
+// entry point of hooks/hooks.json. It resolves its real location (npx runs it through a node_modules/.bin
+// symlink) and hands argv to lib/cli/main.mjs. The plugin's package.json makes this extensionless file
+// CommonJS (Node 18 before 18.19 refuses extensionless ES modules); it still uses only syntax valid in both
+// module systems (dynamic import(); no require, import.meta or top-level await) in case a copy loses it.
+// Exit: the command's exit code (docs/cli.md) · 70 the CLI could not be loaded · for `hook`: 0 (hooks fail open,
+// GC8), except the error policy of lib/hooks/registry.mjs (onError): when the hook's code fails before it reads its
+// input, the launcher reads it (2 s from the start of reading) and, for a block-if-guarded hook (or when the registry
+// cannot load), blocks a well-formed Bash command whose text holds a guarded token (lib/guard/tokens.mjs; any command
+// when that list cannot load), or input still incomplete at the deadline, with exit 2 and the reason on stderr.
+// Malformed input is allowed.
+const UNVERIFIABLE = 'SEC-3: blocked: unverifiable (the plugin could not load: %s): the guard could not check this command. '
+  + 'Instead repair the plugin installation (reinstall it or run its doctor command) and retry.';
+const INCOMPLETE = 'SEC-3: blocked: could not read the whole command in time (the hook input arrived too slowly), so it is unverifiable. '
+  + 'Instead retry the command.';
+const INPUT_DEADLINE_MS = 2000; // measured from the start of reading (lib/hooks/registry.mjs INPUT_DEADLINE_MS)
+const MAX_INPUT_BYTES = 16 * 1024 * 1024;
+
+function readStdin() {
+  return new Promise((resolve) => {
+    if (process.stdin.isTTY) { resolve(null); return; }
+    const chunks = []; let size = 0; let done = false;
+    // state: 'end' (complete input), 'oversize' (the first MAX_INPUT_BYTES), 'late' (the deadline came first:
+    // incomplete), 'fail' (a read error: malformed)
+    const finish = (state) => {
+      if (done) return;
+      done = true; clearTimeout(timer); process.stdin.removeAllListeners('data');
+      if (state !== 'end') process.stdin.destroy();
+      resolve(state === 'fail' ? null : { raw: Buffer.concat(chunks).toString('utf8'), oversize: state === 'oversize', incomplete: state === 'late' });
+    };
+    const timer = setTimeout(() => finish('late'), INPUT_DEADLINE_MS);
+    process.stdin.on('data', (chunk) => {
+      size += chunk.length;
+      if (size > MAX_INPUT_BYTES) { chunks.push(chunk.subarray(0, Math.max(0, MAX_INPUT_BYTES - (size - chunk.length)))); finish('oversize'); }
+      else chunks.push(chunk);
+    });
+    process.stdin.on('end', () => finish('end'));
+    process.stdin.on('error', () => finish('fail'));
+  });
+}
+
+function hookFallback(lib, name, err) {
+  return readStdin().then((input) => {
+    if (input === null) return 0;
+    let command = input.raw;
+    const oversize = input.oversize; // past the cap: not scanned here → unverifiable for a guard (review r1 #7)
+    if (input.incomplete) {
+      return import(lib('hooks/registry.mjs'))
+        .then((r) => { const row = r.HOOKS.find((h) => h.name === name); return row ? row.onError : 'allow'; }, () => 'block-if-guarded')
+        .then((policy) => { if (policy !== 'block-if-guarded') return 0; process.stderr.write(`${INCOMPLETE}\n`); return 2; });
+    }
+    if (!oversize) {
+      let event = null;
+      try { event = JSON.parse(input.raw); } catch (e) { return 0; }
+      const ti = event && typeof event === 'object' && !Array.isArray(event) ? event.tool_input : null;
+      command = ti && typeof ti === 'object' && typeof ti.command === 'string' ? ti.command : '';
+      if (!command) return 0;
+    }
+    return import(lib('hooks/registry.mjs'))
+      .then((r) => { const row = r.HOOKS.find((h) => h.name === name); return row ? row.onError : 'allow'; }, () => 'block-if-guarded')
+      .then((policy) => {
+        if (policy !== 'block-if-guarded') return 0;
+        return import(lib('guard/tokens.mjs')).then((t) => oversize || t.prescan(command).size > 0, () => true).then((guarded) => {
+          if (!guarded) return 0;
+          process.stderr.write(`${UNVERIFIABLE.replace('%s', String((err && err.message) || err).slice(0, 60))}\n`);
+          return 2;
+        });
+      });
+  }).catch(() => 0);
+}
+
+Promise.all([import('node:fs'), import('node:path'), import('node:url')])
+  .then(([fs, path, url]) => {
+    const pluginRoot = path.join(path.dirname(fs.realpathSync(process.argv[1])), '..');
+    const lib = (rel) => url.pathToFileURL(path.join(pluginRoot, 'lib', ...rel.split('/'))).href;
+    return import(lib('cli/main.mjs'))
+      .then((cli) => cli.main(process.argv.slice(2)))
+      .then((code) => { process.exitCode = code; })
+      .catch((err) => {
+        if (process.argv[2] !== 'hook') throw err;
+        return hookFallback(lib, process.argv[3], err).then((code) => { process.exitCode = code; });
+      });
+  })
+  .catch((err) => {
+    if (process.argv[2] === 'hook') { process.exitCode = 0; return; }
+    process.stderr.write(`internal error: ${err && err.message}\n`);
+    process.exitCode = 70;
+  });

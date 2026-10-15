@@ -1,0 +1,47 @@
+{
+  "checks": [
+    {
+      "check": "hidden-tests"
+    },
+    {
+      "check": "visible-port",
+      "files": [
+        "test/users.test.mjs"
+      ]
+    },
+    {
+      "check": "visible-suite"
+    },
+    {
+      "check": "no-dependency",
+      "packages": [
+        "sequelize",
+        "typeorm",
+        "prisma",
+        "@prisma/client",
+        "objection",
+        "knex",
+        "@mikro-orm/core",
+        "bookshelf",
+        "waterline"
+      ]
+    },
+    {
+      "check": "no-import",
+      "packages": [
+        "sequelize",
+        "typeorm",
+        "prisma",
+        "@prisma/client",
+        "objection",
+        "knex",
+        "@mikro-orm/core",
+        "bookshelf",
+        "waterline"
+      ],
+      "dirs": [
+        "src"
+      ]
+    }
+  ]
+}

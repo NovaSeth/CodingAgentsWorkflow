@@ -1,0 +1,16 @@
+{
+  "checks": [
+    {
+      "check": "hidden-tests"
+    },
+    {
+      "check": "visible-port",
+      "files": [
+        "test/messages.test.mjs"
+      ]
+    },
+    {
+      "check": "visible-suite"
+    }
+  ]
+}

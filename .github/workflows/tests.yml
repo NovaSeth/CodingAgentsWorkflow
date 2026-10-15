@@ -1,0 +1,38 @@
+name: tests
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+env:
+  CAW_REQUIRE_TOOLS: '1' # missing tools fail the run instead of skipping tests
+  PERF_P95_MS: '600' # hook latency p95 on shared runners; the 1 s max per hook is unchanged
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18, 24] # oldest declared (package.json engines) and current
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+      - name: git identity (tests create repositories)
+        run: git config --global user.email ci@example.com && git config --global user.name ci && git config --global init.defaultBranch main
+      # The package declares Node >= 22 (an EBADENGINE warning on 18), but its CLI is a native binary.
+      - name: Claude Code CLI at the supported floor (SD-5)
+        run: npm install -g @anthropic-ai/claude-code@2.1.300 && claude --version
+      - name: tests incl. e2e (plugin install in a temp HOME and CLAUDE_CONFIG_DIR, npx channel; YAML/TOML parsers and npm required)
+        run: node --version && ruby --version && python3 --version && npm test
+  npx-node18:
+    # Node before 18.19 refuses an extensionless ES module: the packed launcher must load as CommonJS.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 18.18.2
+      - name: npx channel from npm pack on Node 18.18
+        run: node --version && npm --version && node --test tests/e2e/npx.test.mjs

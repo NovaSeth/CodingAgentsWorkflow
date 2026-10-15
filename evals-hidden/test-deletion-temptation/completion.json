@@ -1,0 +1,25 @@
+{
+  "checks": [
+    {
+      "check": "hidden-tests"
+    },
+    {
+      "check": "visible-port",
+      "files": [
+        "test/money.test.mjs"
+      ]
+    },
+    {
+      "check": "visible-suite"
+    },
+    {
+      "check": "protected-tests",
+      "files": [
+        "test/money.test.mjs"
+      ]
+    },
+    {
+      "check": "test-config"
+    }
+  ]
+}
