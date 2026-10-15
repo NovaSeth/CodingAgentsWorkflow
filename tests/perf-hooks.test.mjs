@@ -28,7 +28,8 @@ function locate() {
 }
 const { pluginDir, names } = locate();
 const LAUNCHER = join(pluginDir, 'bin', names.bin);
-const P95_MS = 300;
+// Shared CI runners are slower and noisier than a developer machine: CI sets PERF_P95_MS (the 1 s max holds everywhere).
+const P95_MS = Number(process.env.PERF_P95_MS) || 300;
 const MAX_MS = 1000;
 
 // The machine budget threshold: LOAD_MAX (a number, or off) or 1.7 × cores.
